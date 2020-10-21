@@ -12,8 +12,8 @@ t = (0:L-1)*T;         % Time vector
 [pks,locs] = findpeaks(data,'MinPeakDistance',200);
 
 % plot ECG data in time domain
-range = 2048;
-plot(t(1:range),data(1:range),t(locs(1:8)),pks(1:8),'or') 
+range = 1000;
+plot(t(1:range),data(1:range),t(locs(1:4)),pks(1:4),'or') 
 title('ECG data in time domain ')
 xlabel('t (s)')
 ylabel('MLII (mV)')

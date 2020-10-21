@@ -1,7 +1,8 @@
 clc;clear;
 
-L = 650000;             % define size of the original dataset
-Fs = 360.06;            % Sampling frequency   
+L = 650000;             % Size of whole dataset
+Total_time = 1805.231;   % Time length of whole dataset in seconds
+Fs = L/Total_time;      % Sampling frequency   
 T = 1/Fs;               % Sampling period       
 t = (0:L-1)*T;          % Time vector
 
@@ -19,6 +20,13 @@ data_noiseremoved = abs(FFT_ECG (data));
 [pks,locs] = findpeaks(data_noiseremoved,'MinPeakDistance',200);
 cycles = diff(locs);
 meanCycle = mean(cycles);
+NumCycles = numel(pks);
+
+% generate RR data from ECG data
+% for i=2:NumCycles
+%     RR(i-1,1) = (locs(i) - locs(i-1))/Fs;    
+% end
+% csvwrite('RR data.csv',RR);
 
 % plot ECG data in time domain
 % range = 2048;
@@ -38,13 +46,12 @@ meanCycle = mean(cycles);
 
 
 % convert data into 2-D array
-NumPeaks_perRow = 6;
-NumCycles = numel(pks);
+NumPeaks_perRow = 6;        % user-defined parameter
 NumRow = ceil(NumCycles/NumPeaks_perRow);
 NumDuplicate = 8;
 NumTerrain = floor((NumRow * NumDuplicate)/NumCol) + 1;
 
-pwave = 0.3;
+pwave = 0.6;                % estimated length in % for p wave between two peaks
 data_start(1) = floor(pwave * locs(1) + (1-pwave) * locs(2));
 
 for i = 1:NumRow
@@ -144,11 +151,12 @@ function edited_data = FFT_ECG (original_data)
     edited_data = ifft(Y);
 end
 
-plot(raw_aligned(167,:)) 
-hold on
-plot(raw_aligned(168,:))
-title('ECG data in time domain ')
-xlabel('t (s)')
-ylabel('MLII (mV)')
-legend('167','168');
-axis tight
+% plot(raw_aligned(167,:)) 
+% hold on
+% plot(raw_aligned(168,:))
+% title('ECG data in time domain ')
+% xlabel('t (s)')
+% ylabel('MLII (mV)')
+% legend('167','168');
+% axis tight
+
