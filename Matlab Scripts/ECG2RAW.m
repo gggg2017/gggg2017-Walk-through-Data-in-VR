@@ -80,9 +80,8 @@ end
 
 % cross correlation with time shift based on the full trace in the previous row
 raw_aligned(1,:) = raw(1,:);
-cycle = 200;
 for i = 2:NumRow
-    [c,lags] = xcorr(raw(i-1,:), raw(i,1:end-cycle * 2));
+    [c,lags] = xcorr(raw(i-1,:), raw(i,:));
     [x,y] = max(c);
     Li = lags(y);
     
