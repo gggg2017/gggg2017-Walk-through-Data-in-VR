@@ -111,12 +111,18 @@ end
 %     end
 % end
 
+% invert the terrain for display purpose
+for i = 1:NumRow
+    for j = 1:NumCol
+        raw_inverted(i,j) = raw_aligned(i,NumCol-j+1);
+    end
+end
 
 % duplicate each row to evenly distribute data in the whole terrain
 for i = 1:NumRow
     for j = 1:NumDuplicate
         k = (i - 1) * NumDuplicate + j;
-        raw_duplicated(k,:) = raw_aligned(i,:);
+        raw_duplicated(k,:) = raw_inverted(i,:);
     end
 end
 % duplicate the rest terrain

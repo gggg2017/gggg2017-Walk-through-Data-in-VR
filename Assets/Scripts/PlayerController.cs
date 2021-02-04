@@ -14,15 +14,12 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
     }
 
-
     public float upForce;
     void FixedUpdate()
     {
-        float moveHorizontal = Input.GetAxis("Horizontal");
-        float moveVertical = Input.GetAxis("Vertical");
-        
-        
-
+        float moveX = Input.GetAxis("Horizontal");
+        float moveZ = Input.GetAxis("Vertical");
+               
         // life the ball
         if (Input.GetKey(KeyCode.I)){ 
             upForce = 9.81f;
@@ -38,8 +35,7 @@ public class PlayerController : MonoBehaviour
             upForce = 0.981f;
         }
 
-        Vector3 movement = new Vector3(moveHorizontal, upForce, moveVertical);
+        Vector3 movement = new Vector3(moveX, upForce, moveZ);
         rb.AddForce(movement * speed);
-        
     }
 }
