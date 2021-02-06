@@ -54,6 +54,8 @@ NumTerrain = floor((NumRow * NumDuplicate)/NumCol) + 1;
 pwave = 0.6;                % estimated length in % for p wave between two peaks
 data_start(1) = floor(pwave * locs(1) + (1-pwave) * locs(2));
 
+offset = 750;               % define the offset when display data in Unity
+
 for i = 1:NumRow
      if ((NumPeaks_perRow*i + 2) <= NumCycles)
          data_end(i) = floor(pwave * locs(NumPeaks_perRow*i+1) + (1-pwave) * locs(NumPeaks_perRow*i+2));
@@ -62,19 +64,29 @@ for i = 1:NumRow
      end
      data_length(i) = data_end(i) - data_start(i);
      data_zero(i) = NumCol - data_length(i);
-     
-     for j = 1:NumCol
-         if j < data_zero(i)/2
-             raw(i,j) = 0;
-         elseif j > (NumCol - data_zero(i)/2)
-             raw(i,j) = 0;
-         else
-             raw(i,j) = data_noiseremoved(data_start(i) + floor(j - data_zero(i)/2)) - 750;
-         end
-     end
-     
+          
      if i < NumRow
          data_start(i+1) = data_end(i) + 1;
+     end
+end
+
+for i = 1:NumRow
+    data_start_value(i) = data_noiseremoved(data_start(i));
+    data_end_value(i) = data_noiseremoved(data_end(i));
+end
+
+median_start = median(data_start_value);
+median_end = median(data_end_value);
+
+for i = 1:NumRow
+    for j = 1:NumCol
+         if j < data_zero(i)/2
+             raw(i,j) = median_start - offset;
+         elseif j > (NumCol - data_zero(i)/2)
+             raw(i,j) = median_end - offset;
+         else
+             raw(i,j) = data_noiseremoved(data_start(i) + floor(j - data_zero(i)/2)) - offset;
+         end
      end
 end
 
@@ -88,28 +100,11 @@ for i = 2:NumRow
     raw_aligned(i,:) = circshift(raw(i,:),Li);
      
     if (Li >= 0)
-        %raw_aligned(i,1:Li) = raw(i-1, end-Li+1:end);
-        raw_aligned(i,1:Li) = 0;
+        raw_aligned(i,1:Li) = median_start - offset;
     else
-        %raw_aligned(i, end+Li+1:end) = raw(i+1, 1:-Li);
-        raw_aligned(i, end+Li+1:end) = 0;
+        raw_aligned(i, end+Li+1:end) = median_end - offset;
     end
 end
-
-% align the first peak in each row
-% raw_aligned(1,:) = raw(1,:);
-% [M,L] = max(raw(1,1:cycle));
-% for i = 2:NumRow
-%     [Mi,Li] = max(raw(i,1:cycle));
-%     
-%     raw_aligned(i,:) = circshift(raw(i,:),-Li+L);
-%      
-%     if (-Li+L >= 0)
-%         raw_aligned(i,1:-Li+L) = raw(i-1, end+Li-L+1:end);
-%     else
-%         raw_aligned(i, end-Li+L+1:end) = raw(i+1, 1:Li-L);
-%     end
-% end
 
 % invert the terrain for display purpose
 for i = 1:NumRow
