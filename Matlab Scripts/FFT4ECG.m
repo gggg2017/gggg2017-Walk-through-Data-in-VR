@@ -28,15 +28,17 @@ end
 
 edited_data = abs(ifft(Y));
 
-% plot ECG data in time domain
+% plot ECG data in Time Domain
 range = 2048;
-plot(t(1:range),original_data(1:range)) 
-hold on
-plot(t(1:range),edited_data(1:range)) 
-title('ECG data in time domain ')
+% plot(t(1:range),original_data(101:range)) 
+% hold on
+% plot(t(1:range),edited_data(1:range))
+plot(t,edited_data)
+title('ECG Data in Time Domain ')
 xlabel('t (s)')
 ylabel('MLII (mV)')
-legend('original ECG','ECG after filtering');
+xlim([40 46])
+% legend('original ECG','ECG after filtering');
 
 % plot FFT (frequency domain)
 % plot(f(1:1806),P1(1:1806)) 

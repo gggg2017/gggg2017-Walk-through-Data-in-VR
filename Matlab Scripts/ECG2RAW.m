@@ -17,7 +17,8 @@ data = data(:,1);
 data_noiseremoved = abs(FFT_ECG (data));
 
 % find peaks of each cycle
-[pks,locs] = findpeaks(data_noiseremoved,'MinPeakDistance',200);
+MinPD = 200;
+[pks,locs] = findpeaks(data_noiseremoved,'MinPeakDistance',MinPD);
 cycles = diff(locs);
 meanCycle = mean(cycles);
 NumCycles = numel(pks);
@@ -134,6 +135,58 @@ for i = 1:NumTerrain
     fclose(fid(i));
 end
 
+% generate the location of peak points for anomaly analysis
+% remove the last 2 rows data for accuracy
+[m,n] = size (raw_duplicated);
+% initial the anomaly map to white (1,1,1)
+planeR = zeros(m,n)+1;
+planeG = zeros(m,n)+1;
+planeB = zeros(m,n)+1;
+
+[m,n] = size (raw_inverted);
+locs = zeros(m-2,NumPeaks_perRow);
+
+for i = 1:NumRow-2
+    [pks,locs(i,:)] = findpeaks(raw_inverted(i,:),'MinPeakDistance',MinPD); 
+end
+
+[m,n] = size (locs);
+length_anomaly = 300;
+for j = 1:NumPeaks_perRow
+    x = 1:m; 
+    y = locs(:,j)'; 
+    [p,S] = polyfit(x,y,2);
+
+    [y_fit,delta] = polyval(p,x,S);
+    
+    for i = 1:NumRow-2
+        if (y(i) >  y_fit(i) + 2*delta) | (y(i) <  y_fit(i) - 2*delta)
+            for h = 1:NumDuplicate
+                for k = 1:length_anomaly
+                    % highlight the abnomalies in red (1,0,0)
+                    planeG (i*NumDuplicate-1+h, y(i)-length_anomaly/2 + k) = 0;
+                    planeB (i*NumDuplicate-1+h, y(i)-length_anomaly/2 + k) = 0;
+                end
+            end
+        end
+    end
+end
+
+% highlight the anomalies in red and write into pictures
+for i = 1:NumTerrain
+    anomaly = cat(3,planeR((i-1)*NumCol+1:(i-1)*NumCol+NumCol,:), planeG((i-1)*NumCol+1:(i-1)*NumCol+NumCol,:), planeB((i-1)*NumCol+1:(i-1)*NumCol+NumCol,:));
+    jpgFileName = strcat('anomaly', num2str(i), '.jpg');
+    imwrite(anomaly,jpgFileName,'jpg','Comment','My JPEG file');  
+end
+
+
+% plot(x,y,'bo')
+% hold on
+% plot(x,y_fit,'r-')
+% plot(x,y_fit+2*delta,'m--',x,y_fit-2*delta,'m--')
+% title('Linear Fit of Data with 95% Prediction Interval')
+% legend('Data','Linear Fit','95% Prediction Interval')
+
 % using FFT to remove certain noise from original data
 function edited_data = FFT_ECG (original_data)
     Y = fft(original_data);
@@ -159,4 +212,7 @@ end
 % ylabel('MLII (mV)')
 % legend('167','168');
 % axis tight
+
+
+
 
