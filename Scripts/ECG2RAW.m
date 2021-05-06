@@ -130,11 +130,12 @@ end
 % write terrain into raw files
 for i = 1:NumTerrain
     cmodel = raw_duplicated(NumCol * i - NumCol + 1:NumCol * i,:);
-    fid(i) = fopen(['terrain',num2str(i),'.raw'],'w+');
+    fid(i) = fopen(['112.',num2str(i),'.raw'],'w+');
     cnt = fwrite(fid(i),cmodel,'uint8');
     fclose(fid(i));
 end
 
+%{
 % generate the location of peak points for anomaly analysis
 % remove the last 2 rows data for accuracy
 [m,n] = size (raw_duplicated);
@@ -175,10 +176,10 @@ end
 % highlight the anomalies in red and write into pictures
 for i = 1:NumTerrain
     anomaly = cat(3,planeR((i-1)*NumCol+1:(i-1)*NumCol+NumCol,:), planeG((i-1)*NumCol+1:(i-1)*NumCol+NumCol,:), planeB((i-1)*NumCol+1:(i-1)*NumCol+NumCol,:));
-    jpgFileName = strcat('anomaly', num2str(i), '.jpg');
+    jpgFileName = strcat('112.', num2str(i),'_anomaly.jpg');
     imwrite(anomaly,jpgFileName,'jpg','Comment','My JPEG file');  
 end
-
+%}
 
 % plot(x,y,'bo')
 % hold on
