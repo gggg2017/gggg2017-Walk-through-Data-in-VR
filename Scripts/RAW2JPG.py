@@ -10,7 +10,7 @@ import numpy as np
 from PIL import Image
 
 
-image = np.memmap('112.1.raw', dtype=np.uint8, shape=(2048, 2048))
+image = np.memmap('100.1.raw', dtype=np.uint8, shape=(2048, 2048))
 
 image = image - image.min()
 image = image * (255.0/image.max())
@@ -22,4 +22,4 @@ print(image)
 img = Image.fromarray(image , 'L')
 img.show()
 
-img.save("112.1.jpg")
+# img.save("112.1.jpg")
